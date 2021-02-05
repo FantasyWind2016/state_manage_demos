@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import '../model/account_model.dart';
 import '../page/login_page.dart';
 import '../page/modify_userinfo_page.dart';
 import '../utils/account_manager.dart';
-import '../utils/event_bus_util.dart';
 
 class MyPage extends StatelessWidget {
   final String title;
@@ -30,24 +30,9 @@ class _MyPageBody extends StatefulWidget {
 }
 
 class _MyPageBodyState extends State<_MyPageBody> {
-  bool showLogoutButton;
-  String userName;
-  String name;
-  void refreshState() {
-    showLogoutButton = !(AccountManager.instance.accountModel.accountID == null ||
-        AccountManager.instance.accountModel.accountID.length == 0);
-    userName = AccountManager.instance.accountModel?.userName;
-    name = AccountManager.instance.accountModel?.userModel?.name;
-  }
 
   @override
   void initState() {
-    refreshState();
-    EventBusUtil.instance.on<AccountModelUpdatedEvent>().listen((onData) {
-      setState(() {
-        refreshState();
-      });
-    });
     super.initState();
   }
 
@@ -69,32 +54,32 @@ class _MyPageBodyState extends State<_MyPageBody> {
   }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(children: [
+    return Observer(
+      builder:(_) => Column(children: [
         Visibility(
-          visible: !showLogoutButton,
+          visible: AccountManager.instance.accountModel.accountStatus==AccountStatus.unlogin,
           child: FlatButton(
             onPressed: unloginButtonPressed, 
             child: Text('用户未登录')
           ),
         ),
         Visibility(
-          visible: showLogoutButton,
+          visible: AccountManager.instance.accountModel.accountStatus!=AccountStatus.unlogin,
           child: Row(
             children: <Widget>[
               Icon(Icons.account_circle, size: 44,),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(userName??''),
-                  Text(name??''),
+                  Text(AccountManager.instance.accountModel.userName??''),
+                  Text(AccountManager.instance.accountModel.userModel?.name??''),
                 ],
               ),
             ],
           )
         ),
         Visibility(
-          visible: showLogoutButton,
+          visible: AccountManager.instance.accountModel.accountStatus!=AccountStatus.unlogin,
           child: Row(
             children: <Widget>[
               Expanded(
@@ -113,7 +98,7 @@ class _MyPageBodyState extends State<_MyPageBody> {
           ),
         ),
         Visibility(
-          visible: showLogoutButton,
+          visible: AccountManager.instance.accountModel.accountStatus!=AccountStatus.unlogin,
           child: Row(
             children: <Widget>[
               Expanded(

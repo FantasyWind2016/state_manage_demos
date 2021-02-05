@@ -4,8 +4,6 @@ import '../model/account_model.dart';
 import '../model/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../utils/event_bus_util.dart';
-
 class AccountManager {
   static AccountManager instance = AccountManager();
   AccountModel accountModel = AccountModel();
@@ -22,25 +20,30 @@ class AccountManager {
           'name': model.userModel?.name
         }
       }));
-      accountModel = model;
-      EventBusUtil.instance.fire(AccountModelUpdatedEvent());
+      accountModel.accountID = model.accountID;
+      accountModel.userName = model.userName;
+      accountModel.password = model.password;
+      accountModel.userModel = model.userModel;
     // });
   }
 
   void loadInfo() {
     SharedPreferences.getInstance().then((sf){
       var str = sf.getString('account_info');
-      var value = jsonDecode(str);
+      var value;
+      if (str!=null && str.length>0) {
+        value = jsonDecode(str);
+      }
+      
       if (value!=null) {
-        accountModel = AccountModel();
         accountModel.accountID = value['accountID'];
         accountModel.userName = value['userName'];
         accountModel.password = value['password'];
         var userModelValue = value['userModel'];
-        accountModel.userModel = UserModel();
-        accountModel.userModel.name = userModelValue['name'];
+        var userModel = UserModel();
+        userModel.name = userModelValue['name'];
+        accountModel.userModel = userModel;
       }
-      EventBusUtil.instance.fire(AccountModelUpdatedEvent());
     });
   }
 }

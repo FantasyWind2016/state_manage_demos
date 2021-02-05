@@ -1,12 +1,28 @@
+import 'package:mobx/mobx.dart';
+
 import '../model/user_model.dart';
 
-class AccountModelUpdatedEvent {
-  
+part 'account_model.g.dart';
+
+enum AccountStatus {
+  unlogin,
+  login
 }
 
-class AccountModel {
+class AccountModel = _AccountModel with _$AccountModel;
+abstract class _AccountModel with Store {
+  @observable
   UserModel userModel;
+
+  @observable
   String accountID;
+
+  @observable
   String userName;
+
+  @observable
   String password;
+
+  @computed
+  AccountStatus get accountStatus => (accountID != null && accountID.length == 0) ? AccountStatus.login : AccountStatus.unlogin;
 }
