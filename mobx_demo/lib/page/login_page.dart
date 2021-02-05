@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 import '../model/account_model.dart';
 import '../model/user_model.dart';
 import '../utils/account_manager.dart';
-
+import 'login_store.dart';
 class LoginPage extends StatelessWidget {
   const LoginPage({Key key}) : super(key: key);
 
@@ -27,26 +29,32 @@ class _LoginPageBody extends StatefulWidget {
 }
 
 class _LoginPageBodyState extends State<_LoginPageBody> {
-  void loginButtonPressed() {
-    AccountModel accountModel = AccountModel();
-    accountModel.accountID = 'u123456';
-    accountModel.userName = userNameController.text;
-    accountModel.password = passwordController.text;
-    accountModel.userModel = UserModel();
-    accountModel.userModel.name = '张三';
-    AccountManager.instance.saveInfo(accountModel);
-
-    Navigator.of(context).pop();
-  }
-
+  var store = LoginStore();
+  var confirmedReaction;
+  
   var userNameController = TextEditingController();
   var passwordController = TextEditingController();
-  bool loginButtonEnable = false;
-  void onTextChanged(_){  
-    setState(() {
-      loginButtonEnable = (userNameController.text != null && userNameController.text.length>0) && (passwordController.text != null && passwordController.text.length>4);
+
+  @override
+  void initState() {
+    confirmedReaction = reaction((_)=>store.confirmed.value, (result){
+      print('confirmed reaction');
+      Navigator.of(context).pop();
     });
+    super.initState();
   }
+
+  @override
+  void dispose() {
+    confirmedReaction();
+    super.dispose();
+  }
+
+  void loginButtonPressed() {
+    print('loginButtonPressed');
+    store.doConfirm();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -57,7 +65,7 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
             Expanded(
               child: TextField(
                 controller: userNameController,
-                onChanged: onTextChanged,
+                onChanged: (value) => store.userName=value,
               ),
             )
           ],
@@ -68,27 +76,29 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
             Expanded(
               child: TextField(
                 controller: passwordController,
-                onChanged: onTextChanged,
+                onChanged: (value) => store.password=value,
               ),
             )
           ],
         ),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: FlatButton(
-                onPressed: loginButtonEnable ? loginButtonPressed : null,
-                child: Text(
-                  '登录',
-                  style: TextStyle(
-                    color: Colors.white,
+        Observer(
+          builder: (_) => Row(
+            children: <Widget>[
+              Expanded(
+                child: FlatButton(
+                  onPressed: store.loginButtonEnable ? loginButtonPressed : null,
+                  child: Text(
+                    '登录',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
+                  color: Colors.green[600],
+                  disabledColor: Colors.grey[400],
                 ),
-                color: Colors.green[600],
-                disabledColor: Colors.grey[400],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ]),
     );
