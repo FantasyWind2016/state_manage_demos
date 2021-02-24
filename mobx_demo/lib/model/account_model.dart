@@ -24,5 +24,5 @@ abstract class _AccountModel with Store {
   String password;
 
   @computed
-  AccountStatus get accountStatus => (accountID != null && accountID.length == 0) ? AccountStatus.login : AccountStatus.unlogin;
+  AccountStatus get accountStatus => (accountID != null && accountID.length > 0) ? AccountStatus.login : AccountStatus.unlogin;
 }
