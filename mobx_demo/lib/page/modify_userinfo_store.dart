@@ -17,9 +17,8 @@ abstract class _ModifyUserInfoStore with Store {
   @action
   void doConfirm() {
     AccountModel accountModel = AccountManager.instance.accountModel;
-    accountModel.userModel = UserModel();
     accountModel.userModel.name = name;
-    AccountManager.instance.saveInfo(accountModel);
+    AccountManager.instance.saveInfo();
 
     confirmed.value++;
   }

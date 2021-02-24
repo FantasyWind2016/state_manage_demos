@@ -12,7 +12,7 @@ enum AccountStatus {
 class AccountModel = _AccountModel with _$AccountModel;
 abstract class _AccountModel with Store {
   @observable
-  UserModel userModel;
+  UserModel userModel = UserModel();
 
   @observable
   String accountID;

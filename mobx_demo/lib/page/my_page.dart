@@ -49,8 +49,8 @@ class _MyPageBodyState extends State<_MyPageBody> {
   }
   
   void logoutButtonPressed() {
-    AccountModel accountModel = AccountModel();
-    AccountManager.instance.saveInfo(accountModel);
+    AccountManager.instance.accountModel = AccountModel();
+    AccountManager.instance.saveInfo();
   }
   @override
   Widget build(BuildContext context) {

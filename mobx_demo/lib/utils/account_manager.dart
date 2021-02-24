@@ -1,30 +1,25 @@
 import 'dart:convert';
+import 'package:mobx/mobx.dart';
 
 import '../model/account_model.dart';
-import '../model/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AccountManager {
-  static AccountManager instance = AccountManager();
-  AccountModel accountModel = AccountModel();
+part 'account_manager.g.dart';
 
-  Future<void> saveInfo (AccountModel model) async {
+class AccountManager extends _AccountManager with _$AccountManager {
+  static AccountManager instance = AccountManager();
+
+
+  Future<void> saveInfo () async {
     var sf = await SharedPreferences.getInstance();
-    // 此处使用promise语法，在退出登录的时候then不会触发
-    // fut.then((sf){
-      sf.setString('account_info', jsonEncode({
-        'accountID': model.accountID,
-        'userName': model.userName,
-        'password': model.password,
-        'userModel': {
-          'name': model.userModel?.name
-        }
-      }));
-      accountModel.accountID = model.accountID;
-      accountModel.userName = model.userName;
-      accountModel.password = model.password;
-      accountModel.userModel = model.userModel;
-    // });
+    sf.setString('account_info', jsonEncode({
+      'accountID': accountModel.accountID,
+      'userName': accountModel.userName,
+      'password': accountModel.password,
+      'userModel': {
+        'name': accountModel.userModel?.name
+      }
+    }));
   }
 
   void loadInfo() {
@@ -40,10 +35,12 @@ class AccountManager {
         accountModel.userName = value['userName'];
         accountModel.password = value['password'];
         var userModelValue = value['userModel'];
-        var userModel = UserModel();
-        userModel.name = userModelValue['name'];
-        accountModel.userModel = userModel;
+        accountModel.userModel.name = userModelValue['name'];
       }
     });
   }
+}
+abstract class _AccountManager with Store {
+  @observable
+  AccountModel accountModel = AccountModel();
 }

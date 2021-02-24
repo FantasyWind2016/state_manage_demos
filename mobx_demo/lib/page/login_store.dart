@@ -21,11 +21,11 @@ abstract class _LoginStore with Store {
   @action
   void doConfirm(){
     print('doConfirm');
-    AccountModel accountModel = AccountModel();
+    AccountModel accountModel = AccountManager.instance.accountModel;
     accountModel.accountID = 'u123456';
     accountModel.userName = userName;
     accountModel.password = password;
-    AccountManager.instance.saveInfo(accountModel);
+    AccountManager.instance.saveInfo();
 
     confirmed.value = true;
   }
