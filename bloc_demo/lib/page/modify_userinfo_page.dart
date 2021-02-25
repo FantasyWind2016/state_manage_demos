@@ -1,4 +1,6 @@
+import 'package:bloc_demo/bloc/modify_userinfo_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../model/account_model.dart';
 import '../model/user_model.dart';
 import '../utils/account_manager.dart';
@@ -13,7 +15,10 @@ class ModifyUserInfoPage extends StatelessWidget {
         appBar: AppBar(
           title: Text('Modify Name'),
         ),
-        body: _ModifyUserInfoPageBody(),
+        body: BlocProvider(
+          create: (_) => ModifyUserinfoBloc(),
+          child: _ModifyUserInfoPageBody(),          
+        ),
       ),
     );
   }
@@ -28,29 +33,30 @@ class _ModifyUserInfoPageBody extends StatefulWidget {
 
 class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
   void confirmButtonPressed() {
-    AccountModel accountModel = AccountManager.instance.accountModel;
-    accountModel.userModel = UserModel();
-    accountModel.userModel.name = nameController.text;
-    AccountManager.instance.saveInfo(accountModel);
-
-    Navigator.of(context).pop();
+    BlocProvider.of<ModifyUserinfoBloc>(context).add(CommitButtonClick());
   }
 
   var nameController = TextEditingController();
-  bool confirmButtonEnable = false;
-  void onTextChanged(_){  
-    setState(() {
-      confirmButtonEnable = nameController.text != null && nameController.text.length>0 && nameController.text != AccountManager.instance.accountModel.userModel.name;
-    });
-  }
+  
   @override
   void initState() {
-    nameController.text = AccountManager.instance.accountModel.userModel.name;
+    // todo 如何单独取state
+    nameController.text = ModifyUserinfoBloc().state.name;
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return BlocListener<ModifyUserinfoBloc, ModifyUserinfoInitial>(
+      listener: (context, state){
+        if (state.commitSuccess) {
+          AccountModel accountModel = AccountManager.instance.accountModel;
+          accountModel.userModel = UserModel();
+          accountModel.userModel.name = nameController.text;
+          AccountManager.instance.saveInfo(accountModel);
+
+          Navigator.of(context).pop();
+        }
+      },
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Row(
           children: <Widget>[
@@ -58,27 +64,33 @@ class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
             Expanded(
               child: TextField(
                 controller: nameController,
-                onChanged: onTextChanged,
+                onChanged: (value){
+                  context.bloc<ModifyUserinfoBloc>().add(NameChanged(name: value));
+                },
               ),
             )
           ],
         ),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: FlatButton(
-                onPressed: confirmButtonEnable ? confirmButtonPressed : null,
-                child: Text(
-                  '修改',
-                  style: TextStyle(
-                    color: Colors.white,
+        BlocBuilder<ModifyUserinfoBloc, ModifyUserinfoInitial>(
+          builder: (context, state) {
+            return Row(
+              children: <Widget>[
+                Expanded(
+                  child: FlatButton(
+                    onPressed: state.commitButtonEnabled ? confirmButtonPressed : null,
+                    child: Text(
+                      '修改',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    color: Colors.green[600],
+                    disabledColor: Colors.grey[400],
                   ),
                 ),
-                color: Colors.green[600],
-                disabledColor: Colors.grey[400],
-              ),
-            ),
-          ],
+              ],
+            );
+          }
         ),
       ]),
     );
