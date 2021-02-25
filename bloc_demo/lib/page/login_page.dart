@@ -1,6 +1,9 @@
+import 'package:bloc_demo/bloc/login_bloc.dart';
 import 'package:flutter/material.dart';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../model/account_model.dart';
-import '../model/user_model.dart';
 import '../utils/account_manager.dart';
 
 class LoginPage extends StatelessWidget {
@@ -13,7 +16,10 @@ class LoginPage extends StatelessWidget {
         appBar: AppBar(
           title: Text('Login'),
         ),
-        body: _LoginPageBody(),
+        body: BlocProvider(
+          create: (_) => LoginBloc(),
+          child: _LoginPageBody(),
+        ),
       ),
     );
   }
@@ -28,36 +34,36 @@ class _LoginPageBody extends StatefulWidget {
 
 class _LoginPageBodyState extends State<_LoginPageBody> {
   void loginButtonPressed() {
-    AccountModel accountModel = AccountModel();
-    accountModel.accountID = 'u123456';
-    accountModel.userName = userNameController.text;
-    accountModel.password = passwordController.text;
-    accountModel.userModel = UserModel();
-    accountModel.userModel.name = '张三';
-    AccountManager.instance.saveInfo(accountModel);
-
-    Navigator.of(context).pop();
+    BlocProvider.of<LoginBloc>(context).add(CommitButtonClick());
   }
 
   var userNameController = TextEditingController();
   var passwordController = TextEditingController();
-  bool loginButtonEnable = false;
-  void onTextChanged(_){  
-    setState(() {
-      loginButtonEnable = (userNameController.text != null && userNameController.text.length>0) && (passwordController.text != null && passwordController.text.length>4);
-    });
-  }
+  
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+    return BlocListener<LoginBloc, LoginInitial>(
+      listener: (context, state) {
+        if (state.loginSuccess) {
+          AccountModel accountModel = AccountModel();
+          accountModel.accountID = 'u123456';
+          accountModel.userName = state.userName;
+          accountModel.password = state.password;
+          AccountManager.instance.saveInfo(accountModel);
+
+          Navigator.of(context).pop();
+        }
+      },
+      child:Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Row(
           children: <Widget>[
             Text('用户名：'),
             Expanded(
               child: TextField(
                 controller: userNameController,
-                onChanged: onTextChanged,
+                onChanged: (value) {
+                  context.bloc<LoginBloc>().add(UserNameChanged(userName: value));
+                },
               ),
             )
           ],
@@ -68,27 +74,33 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
             Expanded(
               child: TextField(
                 controller: passwordController,
-                onChanged: onTextChanged,
+                onChanged: (value) {
+                  BlocProvider.of<LoginBloc>(context).add(PasswordChanged(password: value));
+                },
               ),
             )
           ],
         ),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: FlatButton(
-                onPressed: loginButtonEnable ? loginButtonPressed : null,
-                child: Text(
-                  '登录',
-                  style: TextStyle(
-                    color: Colors.white,
+        BlocBuilder<LoginBloc, LoginInitial>(
+          builder: (context, state) {
+            return Row(
+              children: <Widget>[
+                Expanded(
+                  child: FlatButton(
+                    onPressed: state.loginButtonEnabled ? loginButtonPressed : null,
+                    child: Text(
+                      '登录',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    color: Colors.green[600],
+                    disabledColor: Colors.grey[400],
                   ),
                 ),
-                color: Colors.green[600],
-                disabledColor: Colors.grey[400],
-              ),
-            ),
-          ],
+              ],
+            );
+          }
         ),
       ]),
     );
