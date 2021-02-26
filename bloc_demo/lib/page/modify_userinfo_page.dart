@@ -1,19 +1,20 @@
+import 'package:bloc_demo/bloc/account_bloc.dart';
 import 'package:bloc_demo/bloc/modify_userinfo_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../model/account_model.dart';
 import '../model/user_model.dart';
-import '../utils/account_manager.dart';
 
 class ModifyUserInfoPage extends StatelessWidget {
 
   ModifyUserInfoPage({Key key}) : super(key: key);
 
-  final ModifyUserinfoBloc bloc = ModifyUserinfoBloc();
+  ModifyUserinfoBloc bloc;
 
   final nameController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    // 当前页面bloc需要依赖其他bloc
+    bloc = ModifyUserinfoBloc(initialName: BlocProvider.of<AccountBloc>(context).state.userModel?.name);
     nameController.text = bloc.state.name;
     return Container(
       child: Scaffold(
@@ -36,10 +37,11 @@ class ModifyUserInfoPage extends StatelessWidget {
     return BlocConsumer<ModifyUserinfoBloc, ModifyUserinfoInitial>(
       listener: (context, state){
         if (state.commitSuccess) {
-          AccountModel accountModel = AccountManager.instance.accountModel;
-          accountModel.userModel = UserModel();
-          accountModel.userModel.name = nameController.text;
-          AccountManager.instance.saveInfo(accountModel);
+          var userModel = UserModel();
+          userModel.name = state.name;
+          BlocProvider.of<AccountBloc>(context)?.add(AccountUpdate(
+            userModel: userModel,
+          ));
 
           Navigator.of(context).pop();
         }

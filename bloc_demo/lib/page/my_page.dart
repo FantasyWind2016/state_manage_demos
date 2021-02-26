@@ -1,13 +1,12 @@
+import 'package:bloc_demo/bloc/account_bloc.dart';
 import 'package:flutter/material.dart';
-import '../model/account_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../page/login_page.dart';
 import '../page/modify_userinfo_page.dart';
-import '../utils/account_manager.dart';
-import '../utils/event_bus_util.dart';
 
 class MyPage extends StatelessWidget {
   final String title;
-  const MyPage({Key key,this.title}) : super(key: key);
+  const MyPage({Key key, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,26 +29,6 @@ class _MyPageBody extends StatefulWidget {
 }
 
 class _MyPageBodyState extends State<_MyPageBody> {
-  bool showLogoutButton;
-  String userName;
-  String name;
-  void refreshState() {
-    showLogoutButton = !(AccountManager.instance.accountModel.accountID == null ||
-        AccountManager.instance.accountModel.accountID.length == 0);
-    userName = AccountManager.instance.accountModel?.userName;
-    name = AccountManager.instance.accountModel?.userModel?.name;
-  }
-
-  @override
-  void initState() {
-    refreshState();
-    EventBusUtil.instance.on<AccountModelUpdatedEvent>().listen((onData) {
-      setState(() {
-        refreshState();
-      });
-    });
-    super.initState();
-  }
 
   void unloginButtonPressed() {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) {
@@ -62,76 +41,80 @@ class _MyPageBodyState extends State<_MyPageBody> {
       return ModifyUserInfoPage();
     }));
   }
-  
+
   void logoutButtonPressed() {
-    AccountModel accountModel = AccountModel();
-    AccountManager.instance.saveInfo(accountModel);
+    BlocProvider.of<AccountBloc>(context).add(AccountClear());
   }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(children: [
-        Visibility(
-          visible: !showLogoutButton,
-          child: FlatButton(
-            onPressed: unloginButtonPressed, 
-            child: Text('用户未登录')
-          ),
-        ),
-        Visibility(
-          visible: showLogoutButton,
-          child: Row(
-            children: <Widget>[
-              Icon(Icons.account_circle, size: 44,),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return BlocBuilder<AccountBloc, AccountInitial>(
+      builder: (context, state) {
+        return Container(
+          child: Column(children: [
+            Visibility(
+              visible: state.unlogin,
+              child: FlatButton(
+                  onPressed: unloginButtonPressed, child: Text('用户未登录')),
+            ),
+            Visibility(
+                visible: !state.unlogin,
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.account_circle,
+                      size: 44,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(state.userName ?? ''),
+                        Text(state.userModel?.name ?? ''),
+                      ],
+                    ),
+                  ],
+                )),
+            Visibility(
+              visible: !state.unlogin,
+              child: Row(
                 children: <Widget>[
-                  Text(userName??''),
-                  Text(name??''),
+                  Expanded(
+                    child: FlatButton(
+                      onPressed: modifyNameButtonPressed,
+                      child: Text(
+                        '修改姓名',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      color: Colors.blue[100],
+                    ),
+                  ),
                 ],
               ),
-            ],
-          )
-        ),
-        Visibility(
-          visible: showLogoutButton,
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: FlatButton(
-                  onPressed: modifyNameButtonPressed,
-                  child: Text(
-                    '修改姓名',
-                    style: TextStyle(
-                      color: Colors.white,
+            ),
+            Visibility(
+              visible: !state.unlogin,
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: FlatButton(
+                      onPressed: logoutButtonPressed,
+                      child: Text(
+                        '退出登录',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      color: Colors.red,
                     ),
                   ),
-                  color: Colors.blue[100],
-                ),
+                ],
               ),
-            ],
-          ),
-        ),
-        Visibility(
-          visible: showLogoutButton,
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: FlatButton(
-                  onPressed: logoutButtonPressed,
-                  child: Text(
-                    '退出登录',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  color: Colors.red,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ]),
+            ),
+          ]),
+        );
+      },
     );
   }
 }

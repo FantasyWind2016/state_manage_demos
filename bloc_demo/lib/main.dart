@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'bloc/account_bloc.dart';
 import 'page/root_page.dart';
 import 'utils/account_manager.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(
+    BlocProvider(
+      create: (_)=>AccountBloc(),
+      lazy: false,
+      child:MyApp()
+    )
+  );
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.

@@ -1,10 +1,8 @@
+import 'package:bloc_demo/bloc/account_bloc.dart';
 import 'package:bloc_demo/bloc/login_bloc.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../model/account_model.dart';
-import '../utils/account_manager.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -45,12 +43,11 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
     return BlocListener<LoginBloc, LoginInitial>(
       listener: (context, state) {
         if (state.loginSuccess) {
-          AccountModel accountModel = AccountModel();
-          accountModel.accountID = 'u123456';
-          accountModel.userName = state.userName;
-          accountModel.password = state.password;
-          AccountManager.instance.saveInfo(accountModel);
-
+          BlocProvider.of<AccountBloc>(context)?.add(AccountUpdate(
+            accountID: 'u123456',
+            userName: state.userName,
+            password: state.password,
+          ));
           Navigator.of(context).pop();
         }
       },
