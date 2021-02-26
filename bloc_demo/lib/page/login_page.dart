@@ -81,6 +81,7 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
             )
           ],
         ),
+        // 这里也可以去掉，然后把上面的BlocListener改为Consumer，但rebuild返回就变大了。
         BlocBuilder<LoginBloc, LoginInitial>(
           builder: (context, state) {
             return Row(

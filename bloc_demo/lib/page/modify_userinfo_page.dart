@@ -6,46 +6,33 @@ import '../model/user_model.dart';
 import '../utils/account_manager.dart';
 
 class ModifyUserInfoPage extends StatelessWidget {
-  const ModifyUserInfoPage({Key key}) : super(key: key);
 
+  ModifyUserInfoPage({Key key}) : super(key: key);
+
+  final ModifyUserinfoBloc bloc = ModifyUserinfoBloc();
+
+  final nameController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    nameController.text = bloc.state.name;
     return Container(
       child: Scaffold(
         appBar: AppBar(
           title: Text('Modify Name'),
         ),
         body: BlocProvider(
-          create: (_) => ModifyUserinfoBloc(),
-          child: _ModifyUserInfoPageBody(),          
+          create: (_) => bloc,
+          child:_modifyUserInfoPageBody(context),
         ),
       ),
     );
   }
-}
 
-class _ModifyUserInfoPageBody extends StatefulWidget {
-  _ModifyUserInfoPageBody({Key key}) : super(key: key);
-
-  @override
-  _ModifyUserInfoPageBodyState createState() => _ModifyUserInfoPageBodyState();
-}
-
-class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
   void confirmButtonPressed() {
-    BlocProvider.of<ModifyUserinfoBloc>(context).add(CommitButtonClick());
+    bloc.add(CommitButtonClick());
   }
-
-  var nameController = TextEditingController();
   
-  @override
-  void initState() {
-    // todo 如何单独取state?可以在build里获取bloc初始化，但会执行多次
-    nameController.text = ModifyUserinfoBloc().state.name;
-    super.initState();
-  }
-  @override
-  Widget build(BuildContext context) {
+  Widget _modifyUserInfoPageBody(BuildContext context) {
     return BlocConsumer<ModifyUserinfoBloc, ModifyUserinfoInitial>(
       listener: (context, state){
         if (state.commitSuccess) {
@@ -66,7 +53,7 @@ class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
                 child: TextField(
                   controller: nameController,
                   onChanged: (value){
-                    context.bloc<ModifyUserinfoBloc>().add(NameChanged(name: value));
+                    bloc.add(NameChanged(name: value));
                   },
                 ),
               )
