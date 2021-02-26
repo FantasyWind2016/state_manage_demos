@@ -40,13 +40,13 @@ class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
   
   @override
   void initState() {
-    // todo 如何单独取state
+    // todo 如何单独取state?可以在build里获取bloc初始化，但会执行多次
     nameController.text = ModifyUserinfoBloc().state.name;
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ModifyUserinfoBloc, ModifyUserinfoInitial>(
+    return BlocConsumer<ModifyUserinfoBloc, ModifyUserinfoInitial>(
       listener: (context, state){
         if (state.commitSuccess) {
           AccountModel accountModel = AccountManager.instance.accountModel;
@@ -57,42 +57,40 @@ class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
           Navigator.of(context).pop();
         }
       },
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Row(
-          children: <Widget>[
-            Text('姓名：'),
-            Expanded(
-              child: TextField(
-                controller: nameController,
-                onChanged: (value){
-                  context.bloc<ModifyUserinfoBloc>().add(NameChanged(name: value));
-                },
-              ),
-            )
-          ],
-        ),
-        BlocBuilder<ModifyUserinfoBloc, ModifyUserinfoInitial>(
-          builder: (context, state) {
-            return Row(
-              children: <Widget>[
-                Expanded(
-                  child: FlatButton(
-                    onPressed: state.commitButtonEnabled ? confirmButtonPressed : null,
-                    child: Text(
-                      '修改',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                    color: Colors.green[600],
-                    disabledColor: Colors.grey[400],
-                  ),
+      builder:(context, state) {
+        return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Row(
+            children: <Widget>[
+              Text('姓名：'),
+              Expanded(
+                child: TextField(
+                  controller: nameController,
+                  onChanged: (value){
+                    context.bloc<ModifyUserinfoBloc>().add(NameChanged(name: value));
+                  },
                 ),
-              ],
-            );
-          }
-        ),
-      ]),
+              )
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: FlatButton(
+                  onPressed: state.commitButtonEnabled ? confirmButtonPressed : null,
+                  child: Text(
+                    '修改',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  color: Colors.green[600],
+                  disabledColor: Colors.grey[400],
+                ),
+              ),
+            ],
+          ),
+        ]);
+      } 
     );
   }
 }

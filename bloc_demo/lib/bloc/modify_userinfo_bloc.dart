@@ -9,7 +9,7 @@ part 'modify_userinfo_event.dart';
 part 'modify_userinfo_state.dart';
 
 class ModifyUserinfoBloc extends Bloc<ModifyUserinfoEvent, ModifyUserinfoInitial> {
-  ModifyUserinfoInitial get initialState => ModifyUserinfoInitial(name: AccountManager.instance.accountModel.userModel.name);
+  ModifyUserinfoInitial get initialState => ModifyUserinfoInitial(name: AccountManager.instance.accountModel?.userModel?.name);
 
   @override
   Stream<ModifyUserinfoInitial> mapEventToState(
