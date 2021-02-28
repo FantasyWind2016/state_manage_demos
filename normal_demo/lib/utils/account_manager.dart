@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:normal_demo/model/account_model.dart';
-import 'package:normal_demo/model/user_model.dart';
+import '../model/account_model.dart';
+import '../model/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:normal_demo/utils/event_bus_util.dart';
+import '../utils/event_bus_util.dart';
 
 class AccountManager {
   static AccountManager instance = AccountManager();

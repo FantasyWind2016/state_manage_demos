@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:normal_demo/model/account_model.dart';
-import 'package:normal_demo/page/login_page.dart';
-import 'package:normal_demo/page/modify_userinfo_page.dart';
-import 'package:normal_demo/utils/account_manager.dart';
-import 'package:normal_demo/utils/event_bus_util.dart';
+import '../model/account_model.dart';
+import '../page/login_page.dart';
+import '../page/modify_userinfo_page.dart';
+import '../utils/account_manager.dart';
+import '../utils/event_bus_util.dart';
 
 class MyPage extends StatelessWidget {
   final String title;
@@ -44,6 +44,9 @@ class _MyPageBodyState extends State<_MyPageBody> {
   void initState() {
     refreshState();
     EventBusUtil.instance.on<AccountModelUpdatedEvent>().listen((onData) {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         refreshState();
       });

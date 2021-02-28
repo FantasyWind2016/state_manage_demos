@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:normal_demo/model/account_model.dart';
-import 'package:normal_demo/model/user_model.dart';
-import 'package:normal_demo/utils/account_manager.dart';
+import '../model/account_model.dart';
+import '../model/user_model.dart';
+import '../utils/account_manager.dart';
 
 class ModifyUserInfoPage extends StatelessWidget {
   const ModifyUserInfoPage({Key key}) : super(key: key);

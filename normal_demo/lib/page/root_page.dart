@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:normal_demo/page/home_page.dart';
-import 'package:normal_demo/page/my_page.dart';
+import '../page/home_page.dart';
+import '../page/my_page.dart';
 
 class RootPage extends StatefulWidget {
 
