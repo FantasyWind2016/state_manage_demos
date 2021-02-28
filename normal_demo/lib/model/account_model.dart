@@ -1,4 +1,4 @@
-import 'package:normal_demo/model/user_model.dart';
+import '../model/user_model.dart';
 
 class AccountModelUpdatedEvent {
   

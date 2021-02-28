@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:normal_demo/model/account_model.dart';
-import 'package:normal_demo/model/user_model.dart';
-import 'package:normal_demo/utils/account_manager.dart';
+import '../model/account_model.dart';
+import '../model/user_model.dart';
+import '../utils/account_manager.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -32,8 +32,6 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
     accountModel.accountID = 'u123456';
     accountModel.userName = userNameController.text;
     accountModel.password = passwordController.text;
-    accountModel.userModel = UserModel();
-    accountModel.userModel.name = '张三';
     AccountManager.instance.saveInfo(accountModel);
 
     Navigator.of(context).pop();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:normal_demo/page/root_page.dart';
-import 'package:normal_demo/utils/account_manager.dart';
+import 'page/root_page.dart';
+import 'utils/account_manager.dart';
 
 void main() => runApp(MyApp());
 
