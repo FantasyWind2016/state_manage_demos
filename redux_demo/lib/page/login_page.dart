@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../model/account_model.dart';
-import '../model/user_model.dart';
-import '../utils/account_manager.dart';
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'login_state.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -13,7 +13,10 @@ class LoginPage extends StatelessWidget {
         appBar: AppBar(
           title: Text('Login'),
         ),
-        body: _LoginPageBody(),
+        body: StoreProvider(
+          store: Store<LoginState>(loginReducer, initialState: LoginState()),
+          child: _LoginPageBody()
+        ),
       ),
     );
   }
@@ -27,24 +30,25 @@ class _LoginPageBody extends StatefulWidget {
 }
 
 class _LoginPageBodyState extends State<_LoginPageBody> {
+  Store store;
+  @override
+  void initState() {
+    store = StoreProvider.of<LoginState>(context, listen: false);
+    store.onChange.listen((onData){
+      if (onData is LoginState) {
+        if (onData.commitSuccess) {
+          Navigator.of(context).pop();
+        }
+      }
+    });
+    super.initState();
+  }
   void loginButtonPressed() {
-    AccountModel accountModel = AccountModel();
-    accountModel.accountID = 'u123456';
-    accountModel.userName = userNameController.text;
-    accountModel.password = passwordController.text;
-    AccountManager.instance.saveInfo(accountModel);
-
-    Navigator.of(context).pop();
+    store.dispatch(Commit());
   }
 
   var userNameController = TextEditingController();
   var passwordController = TextEditingController();
-  bool loginButtonEnable = false;
-  void onTextChanged(_){  
-    setState(() {
-      loginButtonEnable = (userNameController.text != null && userNameController.text.length>0) && (passwordController.text != null && passwordController.text.length>4);
-    });
-  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -55,7 +59,9 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
             Expanded(
               child: TextField(
                 controller: userNameController,
-                onChanged: onTextChanged,
+                onChanged: (value){
+                  store.dispatch(UserNameUpdate(value));
+                },
               ),
             )
           ],
@@ -66,7 +72,9 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
             Expanded(
               child: TextField(
                 controller: passwordController,
-                onChanged: onTextChanged,
+                onChanged: (value){
+                  store.dispatch(PasswordUpdate(value));
+                },
               ),
             )
           ],
@@ -74,16 +82,19 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
         Row(
           children: <Widget>[
             Expanded(
-              child: FlatButton(
-                onPressed: loginButtonEnable ? loginButtonPressed : null,
-                child: Text(
-                  '登录',
-                  style: TextStyle(
-                    color: Colors.white,
+              child: StoreConnector<LoginState, bool>(
+                converter: (store)=>store.state.commitButtonEnable,
+                builder:(context, value) => FlatButton(
+                  onPressed: value ? loginButtonPressed : null,
+                  child: Text(
+                    '登录',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
+                  color: Colors.green[600],
+                  disabledColor: Colors.grey[400],
                 ),
-                color: Colors.green[600],
-                disabledColor: Colors.grey[400],
               ),
             ),
           ],
