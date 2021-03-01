@@ -1,3 +1,4 @@
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider_demo/model/account_model.dart';
@@ -22,26 +23,22 @@ class ModifyUserInfoPage extends StatelessWidget {
   }
 }
 
-class _ModifyUserInfoPageBody extends StatefulWidget {
+class _ModifyUserInfoPageBody extends StatelessWidget {
   _ModifyUserInfoPageBody({Key key}) : super(key: key);
-
-  @override
-  _ModifyUserInfoPageBodyState createState() => _ModifyUserInfoPageBodyState();
-}
-
-class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
-  void confirmButtonPressed() {
-    Provider.of<ModifyUserinfoModel>(context, listen: false).commit(Provider.of<AccountModel>(context, listen: false));
+  confirmButtonPressed() {
+    Provider.of<ModifyUserinfoModel>(aContext, listen: false).commit(Provider.of<AccountModel>(aContext, listen: false));
   }
 
-  var nameController = TextEditingController();
-  @override
-  void initState() {
-    nameController.text = Provider.of<ModifyUserinfoModel>(context, listen: false).initialName;
-    super.initState();
-  }
+  final nameController = TextEditingController();
+  // 交互方法需要context
+  BuildContext aContext;
   @override
   Widget build(BuildContext context) {
+    // 因为没有initState方法，所以需要一个只执行一次的方法
+    AsyncMemoizer().runOnce((){
+      nameController.text = Provider.of<ModifyUserinfoModel>(context, listen: false).initialName;
+      aContext = context;
+    });
     return Consumer<ModifyUserinfoModel>(
       builder: (context, model, child) {
         if (model.commitSuccess) {

@@ -22,23 +22,18 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-class _LoginPageBody extends StatefulWidget {
+class _LoginPageBody extends StatelessWidget {
   _LoginPageBody({Key key}) : super(key: key);
-
-  @override
-  _LoginPageBodyState createState() => _LoginPageBodyState();
-}
-
-class _LoginPageBodyState extends State<_LoginPageBody> {
-  var userNameController = TextEditingController();
-  var passwordController = TextEditingController();
+  final userNameController = TextEditingController();
+  final passwordController = TextEditingController();
 
   loginButtonPressed(){
-    Provider.of<LoginModel>(context, listen: false).commit(Provider.of<AccountModel>(context, listen: false));
+    Provider.of<LoginModel>(aContext, listen: false).commit(Provider.of<AccountModel>(aContext, listen: false));
   }
-
+  BuildContext aContext;
   @override
   Widget build(BuildContext context) {
+    aContext = context;
     return Consumer<LoginModel>(
       builder:(context, model, child) {
         if (model.commitSuccess) {
