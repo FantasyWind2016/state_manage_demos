@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider_demo/model/account_model.dart';
-import '../utils/account_manager.dart';
 import 'modify_userinfo_model.dart';
 
 class ModifyUserInfoPage extends StatelessWidget {

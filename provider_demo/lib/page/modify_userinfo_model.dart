@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../model/account_model.dart';
 import '../model/user_model.dart';
-import '../utils/account_manager.dart';
 
 class ModifyUserinfoModel with ChangeNotifier {
   final String initialName;

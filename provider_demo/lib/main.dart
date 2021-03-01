@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:provider_demo/model/account_model.dart';
 
 import 'page/root_page.dart';
-import 'utils/account_manager.dart';
 
 void main() => runApp(ChangeNotifierProvider(
   create: (_)=>AccountModel(true),
@@ -14,7 +13,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // AccountManager.instance.loadInfo();
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
