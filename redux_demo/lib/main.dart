@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
+import 'page/root_page.dart';
+import 'utils/account_manager.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    AccountManager.instance.loadInfo();
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -20,7 +24,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: RootPage(),
     );
   }
 }
