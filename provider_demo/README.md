@@ -1,16 +1,7 @@
 # provider_demo
 
-A new Flutter project.
+遇到的问题：
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- 在widget的回调方法中使用`Provider.of`获取model时，必须加上`listen:false`，否则会报错。也就是说该方法默认是监听的。  
+- 未找到合适的方法可以单独的监听model的属性，比如监听网络请求返回成功后关闭当前界面；可以使用Consumer，在builder中处理，但builder方法还有child参数，有点冗余。另外这个builder方法不是专门给监听用的，不是异步执行，所以不能直接pop出页面，需要转为异步执行。  
+- 刷新颗粒度有点大，这个问题和BLoC、GetX一样，只有MobX做到了精细化刷新。Consumer的监听是整个model，在监听成功后关闭页面的同时，其他监听也会rebuild页面。最后是需要使用Selector的selector+shouldRebuild来控制其他监听者不刷新。  

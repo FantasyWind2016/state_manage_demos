@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../model/account_model.dart';
-import '../model/user_model.dart';
-import '../utils/account_manager.dart';
+import 'package:provider/provider.dart';
+import 'login_model.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -13,7 +12,10 @@ class LoginPage extends StatelessWidget {
         appBar: AppBar(
           title: Text('Login'),
         ),
-        body: _LoginPageBody(),
+        body: ChangeNotifierProvider<LoginModel>(
+          create: (_)=>LoginModel(),
+          child: _LoginPageBody()
+        ),
       ),
     );
   }
@@ -27,27 +29,24 @@ class _LoginPageBody extends StatefulWidget {
 }
 
 class _LoginPageBodyState extends State<_LoginPageBody> {
-  void loginButtonPressed() {
-    AccountModel accountModel = AccountModel();
-    accountModel.accountID = 'u123456';
-    accountModel.userName = userNameController.text;
-    accountModel.password = passwordController.text;
-    AccountManager.instance.saveInfo(accountModel);
-
-    Navigator.of(context).pop();
-  }
-
   var userNameController = TextEditingController();
   var passwordController = TextEditingController();
-  bool loginButtonEnable = false;
-  void onTextChanged(_){  
-    setState(() {
-      loginButtonEnable = (userNameController.text != null && userNameController.text.length>0) && (passwordController.text != null && passwordController.text.length>4);
-    });
+
+  loginButtonPressed(){
+    Provider.of<LoginModel>(context, listen: false).commit();
   }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Consumer<LoginModel>(
+      builder:(context, model, child) {
+        if (model.commitSuccess) {
+          Future((){
+            Navigator.of(context).pop();
+          });
+        }
+        return child;
+      },
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Row(
           children: <Widget>[
@@ -55,7 +54,9 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
             Expanded(
               child: TextField(
                 controller: userNameController,
-                onChanged: onTextChanged,
+                onChanged: (value) {
+                  Provider.of<LoginModel>(context, listen: false).userName = value;
+                },
               ),
             )
           ],
@@ -66,27 +67,36 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
             Expanded(
               child: TextField(
                 controller: passwordController,
-                onChanged: onTextChanged,
+                onChanged: (value){
+                  Provider.of<LoginModel>(context, listen: false).password = value;
+                },
               ),
             )
           ],
         ),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: FlatButton(
-                onPressed: loginButtonEnable ? loginButtonPressed : null,
-                child: Text(
-                  '登录',
-                  style: TextStyle(
-                    color: Colors.white,
+        Selector<LoginModel, bool>(
+          selector: (context, model) => model.commitButtonEnable,
+          shouldRebuild: (pre, next) => pre!=next,
+          builder:(context, value, child) {
+            return Row(
+              children: <Widget>[
+                Expanded(
+                  child: FlatButton(
+                    onPressed: value ? loginButtonPressed : null,
+                    child: child,
+                    color: Colors.green[600],
+                    disabledColor: Colors.grey[400],
                   ),
                 ),
-                color: Colors.green[600],
-                disabledColor: Colors.grey[400],
-              ),
+              ],
+            );
+          },
+          child: Text(
+            '登录',
+            style: TextStyle(
+              color: Colors.white,
             ),
-          ],
+          ),
         ),
       ]),
     );
