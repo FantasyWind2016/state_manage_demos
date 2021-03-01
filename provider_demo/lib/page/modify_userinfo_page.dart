@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../model/account_model.dart';
-import '../model/user_model.dart';
+import 'package:provider/provider.dart';
 import '../utils/account_manager.dart';
+import 'modify_userinfo_model.dart';
 
 class ModifyUserInfoPage extends StatelessWidget {
   const ModifyUserInfoPage({Key key}) : super(key: key);
@@ -13,7 +13,10 @@ class ModifyUserInfoPage extends StatelessWidget {
         appBar: AppBar(
           title: Text('Modify Name'),
         ),
-        body: _ModifyUserInfoPageBody(),
+        body: ChangeNotifierProvider(
+          create: (_)=>ModifyUserinfoModel(),
+          child: _ModifyUserInfoPageBody()
+        ),
       ),
     );
   }
@@ -28,59 +31,68 @@ class _ModifyUserInfoPageBody extends StatefulWidget {
 
 class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
   void confirmButtonPressed() {
-    AccountModel accountModel = AccountManager.instance.accountModel;
-    accountModel.userModel = UserModel();
-    accountModel.userModel.name = nameController.text;
-    AccountManager.instance.saveInfo(accountModel);
-
-    Navigator.of(context).pop();
+    Provider.of<ModifyUserinfoModel>(context, listen: false).commit();
   }
 
   var nameController = TextEditingController();
-  bool confirmButtonEnable = false;
-  void onTextChanged(_){  
-    setState(() {
-      confirmButtonEnable = nameController.text != null && nameController.text.length>0 && nameController.text != AccountManager.instance.accountModel.userModel.name;
-    });
-  }
   @override
   void initState() {
-    nameController.text = AccountManager.instance.accountModel.userModel?.name;
+    nameController.text = Provider.of<ModifyUserinfoModel>(context, listen: false).name;
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Row(
-          children: <Widget>[
-            Text('姓名：'),
-            Expanded(
-              child: TextField(
-                controller: nameController,
-                onChanged: onTextChanged,
-              ),
-            )
-          ],
-        ),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: FlatButton(
-                onPressed: confirmButtonEnable ? confirmButtonPressed : null,
-                child: Text(
-                  '修改',
-                  style: TextStyle(
-                    color: Colors.white,
+    return Consumer<ModifyUserinfoModel>(
+      builder: (context, model, child) {
+        if (model.commitSuccess) {
+          Future((){
+            Navigator.of(context).pop();
+          });
+        }
+        return child;
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center, 
+        children: [
+          Row(
+            children: <Widget>[
+              Text('姓名：'),
+              Expanded(
+                child: TextField(
+                  controller: nameController,
+                  onChanged: (value){
+                    Provider.of<ModifyUserinfoModel>(context, listen: false).name = value;
+                  },
+                ),
+              )
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Selector<ModifyUserinfoModel, bool>(
+                  selector: (context, model)=>model.commitButtonEnable,
+                  shouldRebuild: (pre, next)=>pre!=next,
+                  builder: (context, value, child) {
+                    return FlatButton(
+                      onPressed: value ? confirmButtonPressed : null,
+                      child: child,
+                      color: Colors.green[600],
+                      disabledColor: Colors.grey[400],
+                    );
+                  },
+                  child: Text(
+                    '修改',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-                color: Colors.green[600],
-                disabledColor: Colors.grey[400],
               ),
-            ),
-          ],
-        ),
-      ]),
+            ],
+          ),
+        ]
+      ),
     );
   }
 }
