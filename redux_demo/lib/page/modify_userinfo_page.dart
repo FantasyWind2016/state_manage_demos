@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../model/account_model.dart';
-import '../model/user_model.dart';
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'modify_userinfo_state.dart';
 import '../utils/account_manager.dart';
 
 class ModifyUserInfoPage extends StatelessWidget {
@@ -13,7 +14,10 @@ class ModifyUserInfoPage extends StatelessWidget {
         appBar: AppBar(
           title: Text('Modify Name'),
         ),
-        body: _ModifyUserInfoPageBody(),
+        body: StoreProvider(
+          store: Store<ModifyUserinfoState>(loginReducer, initialState: ModifyUserinfoState(initialName: AccountManager.instance.accountModel.userModel?.name)),
+          child: _ModifyUserInfoPageBody()
+        ),
       ),
     );
   }
@@ -27,24 +31,22 @@ class _ModifyUserInfoPageBody extends StatefulWidget {
 }
 
 class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
+  Store store;
   void confirmButtonPressed() {
-    AccountModel accountModel = AccountManager.instance.accountModel;
-    accountModel.userModel = UserModel();
-    accountModel.userModel.name = nameController.text;
-    AccountManager.instance.saveInfo(accountModel);
-
-    Navigator.of(context).pop();
+    store.dispatch(Commit());
   }
 
   var nameController = TextEditingController();
-  bool confirmButtonEnable = false;
-  void onTextChanged(_){  
-    setState(() {
-      confirmButtonEnable = nameController.text != null && nameController.text.length>0 && nameController.text != AccountManager.instance.accountModel.userModel?.name;
-    });
-  }
   @override
   void initState() {
+    store = StoreProvider.of<ModifyUserinfoState>(context, listen: false);
+    store.onChange.listen((onData){
+      if (onData is ModifyUserinfoState) {
+        if (onData.commitSuccess) {
+          Navigator.of(context).pop();
+        }
+      }
+    });
     nameController.text = AccountManager.instance.accountModel.userModel?.name;
     super.initState();
   }
@@ -58,7 +60,9 @@ class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
             Expanded(
               child: TextField(
                 controller: nameController,
-                onChanged: onTextChanged,
+                onChanged: (value){
+                  store.dispatch(NameUpdate(value));
+                },
               ),
             )
           ],
@@ -66,16 +70,19 @@ class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
         Row(
           children: <Widget>[
             Expanded(
-              child: FlatButton(
-                onPressed: confirmButtonEnable ? confirmButtonPressed : null,
-                child: Text(
-                  '修改',
-                  style: TextStyle(
-                    color: Colors.white,
+              child: StoreConnector<ModifyUserinfoState, bool>(
+                converter: (store)=>store.state.commitButtonEnable,
+                builder:(context, value) => FlatButton(
+                  onPressed: value ? confirmButtonPressed : null,
+                  child: Text(
+                    '修改',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
+                  color: Colors.green[600],
+                  disabledColor: Colors.grey[400],
                 ),
-                color: Colors.green[600],
-                disabledColor: Colors.grey[400],
               ),
             ),
           ],

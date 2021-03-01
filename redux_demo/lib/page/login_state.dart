@@ -53,7 +53,6 @@ class LoginState {
   LoginState copyWith({
     String userName,
     String password,
-    bool commitButtonEnable,
     bool commitSuccess,
   }) {
     return LoginState(
