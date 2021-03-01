@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
 
 import 'page/root_page.dart';
-import 'utils/account_manager.dart';
+import 'model/account_model.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(StoreProvider(
+  store: Store<AccountModel>(
+    accountReducer, 
+    middleware: [thunkMiddleware],
+    initialState: AccountModel()
+  ),
+  child: MyApp(),
+));
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    AccountManager.instance.loadInfo();
+    StoreProvider.of<AccountModel>(context, listen: false).dispatch(asyncLoadAccount());
+    // AccountManager.instance.loadInfo();
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(

@@ -1,17 +1,15 @@
-import 'package:redux_demo/model/user_model.dart';
+import 'package:redux/redux.dart';
 
 import '../model/account_model.dart';
-import '../utils/account_manager.dart';
+import '../model/user_model.dart';
 
 ModifyUserinfoState modifyUserinfoReducer(ModifyUserinfoState state, action) {
   if (action is NameUpdate) {
     return state.copyWith(name: action.name);
   } else if (action is Commit) {
-    AccountModel accountModel = AccountManager.instance.accountModel;
-    accountModel.userModel = UserModel();
-    accountModel.userModel.name = state.name;
-    AccountManager.instance.saveInfo(accountModel);
-
+    var userModel = UserModel();
+    userModel.name = state.name;
+    action.accountStore.dispatch(AccountUpdate(userModel: userModel));
     return state.copyWith(commitSuccess: true);
   }
   return state;
@@ -27,7 +25,10 @@ class NameUpdate implements ModifyUserinfoAction {
 }
 
 class Commit implements ModifyUserinfoAction {
-  
+  Store accountStore;
+  Commit(Store store){
+    accountStore = store;
+  }
 }
 
 class ModifyUserinfoState {

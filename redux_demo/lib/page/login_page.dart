@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+
+import '../model/account_model.dart';
 import 'login_state.dart';
 
 class LoginPage extends StatelessWidget {
@@ -44,7 +46,7 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
     super.initState();
   }
   void loginButtonPressed() {
-    store.dispatch(Commit());
+    store.dispatch(Commit(StoreProvider.of<AccountModel>(context, listen: false)));
   }
 
   var userNameController = TextEditingController();

@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+
+import '../model/account_model.dart';
 import 'modify_userinfo_state.dart';
-import '../utils/account_manager.dart';
 
 class ModifyUserInfoPage extends StatelessWidget {
   const ModifyUserInfoPage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var accountStore = StoreProvider.of<AccountModel>(context, listen: false);
     return Container(
       child: Scaffold(
         appBar: AppBar(
           title: Text('Modify Name'),
         ),
         body: StoreProvider(
-          store: Store<ModifyUserinfoState>(modifyUserinfoReducer, initialState: ModifyUserinfoState(initialName: AccountManager.instance.accountModel.userModel?.name)),
+          store: Store<ModifyUserinfoState>(modifyUserinfoReducer, initialState: ModifyUserinfoState(initialName: accountStore.state.userModel?.name)),
           child: _ModifyUserInfoPageBody()
         ),
       ),
@@ -31,9 +33,9 @@ class _ModifyUserInfoPageBody extends StatefulWidget {
 }
 
 class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
-  Store store;
+  Store<ModifyUserinfoState> store;
   void confirmButtonPressed() {
-    store.dispatch(Commit());
+    store.dispatch(Commit(StoreProvider.of<AccountModel>(context, listen: false)));
   }
 
   var nameController = TextEditingController();
@@ -47,7 +49,7 @@ class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
         }
       }
     });
-    nameController.text = AccountManager.instance.accountModel.userModel?.name;
+    nameController.text = store.state.initialName;
     super.initState();
   }
   @override

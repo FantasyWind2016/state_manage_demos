@@ -8,3 +8,4 @@ Redux的结构和BLoC高度类似。
 消费：BlocListener纯监听/BlocBuilder界面/BlocConsumer兼有--StoreConnector/onChange监听  
 BLoC有multi系统的工具类，Redux未提供。  
 Redux在StoreConnector中提供了完整的状态生命周期回调。  
+Redux异步Action需要借助redux_thunk。  

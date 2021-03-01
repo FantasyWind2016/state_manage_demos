@@ -1,5 +1,6 @@
+import 'package:redux/redux.dart';
+
 import '../model/account_model.dart';
-import '../utils/account_manager.dart';
 
 LoginState loginReducer(LoginState state, action) {
   if (action is UserNameUpdate) {
@@ -7,12 +8,11 @@ LoginState loginReducer(LoginState state, action) {
   } else if (action is PasswordUpdate) {
     return state.copyWith(password: action.password);
   } else if (action is Commit) {
-    AccountModel accountModel = AccountModel();
-    accountModel.accountID = 'u123456';
-    accountModel.userName = state.userName;
-    accountModel.password = state.password;
-    AccountManager.instance.saveInfo(accountModel);
-
+    action.accountStore.dispatch(AccountUpdate(
+      accountID: 'u123456',
+      userName: state.userName,
+      password: state.password,
+    ));
     return state.copyWith(commitSuccess: true);
   }
   return state;
@@ -35,7 +35,10 @@ class PasswordUpdate implements LoginAction {
 }
 
 class Commit implements LoginAction {
-  
+  Store accountStore;
+  Commit(Store store){
+    accountStore = store;
+  }
 }
 
 class LoginState {
