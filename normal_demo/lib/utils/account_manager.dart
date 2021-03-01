@@ -30,6 +30,9 @@ class AccountManager {
   void loadInfo() {
     SharedPreferences.getInstance().then((sf){
       var str = sf.getString('account_info');
+      if (str==null || str.length==0) {
+        return;
+      }
       var value = jsonDecode(str);
       if (value!=null) {
         accountModel = AccountModel();
