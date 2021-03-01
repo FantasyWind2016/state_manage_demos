@@ -74,29 +74,30 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
             )
           ],
         ),
-        Selector<LoginModel, bool>(
-          selector: (context, model) => model.commitButtonEnable,
-          shouldRebuild: (pre, next) => pre!=next,
-          builder:(context, value, child) {
-            return Row(
-              children: <Widget>[
-                Expanded(
-                  child: FlatButton(
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: Selector<LoginModel, bool>(
+                selector: (context, model) => model.commitButtonEnable,
+                shouldRebuild: (pre, next) => pre!=next,
+                builder:(context, value, child) {
+                  // 刷新时，只有FlatButton会被rebuild
+                  return FlatButton(
                     onPressed: value ? loginButtonPressed : null,
                     child: child,
                     color: Colors.green[600],
                     disabledColor: Colors.grey[400],
+                  );
+                },
+                child: Text(
+                  '登录',
+                  style: TextStyle(
+                    color: Colors.white,
                   ),
                 ),
-              ],
-            );
-          },
-          child: Text(
-            '登录',
-            style: TextStyle(
-              color: Colors.white,
+              ),
             ),
-          ),
+          ],
         ),
       ]),
     );
