@@ -5,7 +5,11 @@ import '../model/user_model.dart';
 import '../utils/account_manager.dart';
 
 class ModifyUserinfoModel with ChangeNotifier {
-  String _name = AccountManager.instance.accountModel.userModel?.name;
+  final String initialName;
+  ModifyUserinfoModel({
+    this.initialName,
+  });
+  String _name;
   String get name {
     return _name;
   }
@@ -13,7 +17,7 @@ class ModifyUserinfoModel with ChangeNotifier {
     _name = value;
     notifyListeners();
   }
-  bool get commitButtonEnable => name != null && name.length>0 && name != AccountManager.instance.accountModel.userModel.name;
+  bool get commitButtonEnable => name != null && name.length>0 && name != initialName;
   bool _commitSuccess = false;
   get commitSuccess {
     return _commitSuccess;
@@ -22,11 +26,10 @@ class ModifyUserinfoModel with ChangeNotifier {
     this._commitSuccess = value;
     notifyListeners();
   }
-  void commit(){
-    AccountModel accountModel = AccountManager.instance.accountModel;
-    accountModel.userModel = UserModel();
-    accountModel.userModel.name = name;
-    AccountManager.instance.saveInfo(accountModel);
+  void commit(AccountModel model){
+    model.userModel = UserModel();
+    model.userModel.name = name;
+    model.save(model);
     commitSuccess = true;
   }
 }

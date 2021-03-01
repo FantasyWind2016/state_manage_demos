@@ -1,9 +1,7 @@
-import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../model/account_model.dart';
 import '../page/login_page.dart';
-import '../utils/account_manager.dart';
-import '../utils/event_bus_util.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key key}) : super(key: key);
@@ -29,27 +27,6 @@ class _HomePageBody extends StatefulWidget {
 }
 
 class _HomePageBodyState extends State<_HomePageBody> {
-  bool showUnloginButton;
-  String userName;
-  void refreshState() {
-    showUnloginButton = AccountManager.instance.accountModel.accountID == null ||
-        AccountManager.instance.accountModel.accountID.length == 0;
-    userName = AccountManager.instance.accountModel.userName;
-  }
-
-  @override
-  void initState() {
-    refreshState();
-    EventBusUtil.instance.on<AccountModelUpdatedEvent>().listen((onData) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        refreshState();
-      });
-    });
-    super.initState();
-  }
 
   void unloginButtonPressed() {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) {
@@ -59,21 +36,21 @@ class _HomePageBodyState extends State<_HomePageBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(children: [
+    return Consumer<AccountModel>(
+      builder:(context, model, child) => Column(children: [
         Visibility(
-          visible: showUnloginButton,
+          visible: model.isUnlogin,
           child: FlatButton(
             onPressed: unloginButtonPressed, 
             child: Text('用户未登录')
           ),
         ),
         Visibility(
-          visible: !showUnloginButton,
+          visible: !model.isUnlogin,
           child: Row(
             children: <Widget>[
               Icon(Icons.account_circle),
-              Text(userName??''),
+              Text(model.userName??''),
             ],
           )
         ),

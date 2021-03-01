@@ -1,14 +1,19 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 import '../model/account_model.dart';
 import '../model/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../utils/event_bus_util.dart';
+// import '../utils/event_bus_util.dart';
 
-class AccountManager {
+class AccountManager with ChangeNotifier {
   static AccountManager instance = AccountManager();
-  AccountModel accountModel = AccountModel();
+  AccountManager(){
+    loadInfo();
+  }
+  AccountModel accountModel = AccountModel(false);
 
   Future<void> saveInfo (AccountModel model) async {
     var sf = await SharedPreferences.getInstance();
@@ -23,7 +28,8 @@ class AccountManager {
         }
       }));
       accountModel = model;
-      EventBusUtil.instance.fire(AccountModelUpdatedEvent());
+      notifyListeners();
+      // EventBusUtil.instance.fire(AccountModelUpdatedEvent());
     // });
   }
 
@@ -35,7 +41,7 @@ class AccountManager {
       }
       var value = jsonDecode(str);
       if (value!=null) {
-        accountModel = AccountModel();
+        accountModel = AccountModel(false);
         accountModel.accountID = value['accountID'];
         accountModel.userName = value['userName'];
         accountModel.password = value['password'];
@@ -43,7 +49,8 @@ class AccountManager {
         accountModel.userModel = UserModel();
         accountModel.userModel.name = userModelValue['name'];
       }
-      EventBusUtil.instance.fire(AccountModelUpdatedEvent());
+      notifyListeners();
+      // EventBusUtil.instance.fire(AccountModelUpdatedEvent());
     });
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../model/account_model.dart';
-import '../utils/account_manager.dart';
 
 class LoginModel with ChangeNotifier {
   String _userName;
@@ -28,12 +27,12 @@ class LoginModel with ChangeNotifier {
     this._commitSuccess = value;
     notifyListeners();
   }
-  void commit(){
-    AccountModel accountModel = AccountModel();
+  void commit(AccountModel account){
+    AccountModel accountModel = AccountModel(false);
     accountModel.accountID = 'u123456';
     accountModel.userName = userName;
     accountModel.password = password;
-    AccountManager.instance.saveInfo(accountModel);
+    account.save(accountModel);
     commitSuccess = true;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:provider_demo/model/account_model.dart';
 import '../utils/account_manager.dart';
 import 'modify_userinfo_model.dart';
 
@@ -14,7 +15,7 @@ class ModifyUserInfoPage extends StatelessWidget {
           title: Text('Modify Name'),
         ),
         body: ChangeNotifierProvider(
-          create: (_)=>ModifyUserinfoModel(),
+          create: (_)=>ModifyUserinfoModel(initialName: Provider.of<AccountModel>(context, listen: false).userModel?.name),
           child: _ModifyUserInfoPageBody()
         ),
       ),
@@ -31,13 +32,13 @@ class _ModifyUserInfoPageBody extends StatefulWidget {
 
 class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
   void confirmButtonPressed() {
-    Provider.of<ModifyUserinfoModel>(context, listen: false).commit();
+    Provider.of<ModifyUserinfoModel>(context, listen: false).commit(Provider.of<AccountModel>(context, listen: false));
   }
 
   var nameController = TextEditingController();
   @override
   void initState() {
-    nameController.text = Provider.of<ModifyUserinfoModel>(context, listen: false).name;
+    nameController.text = Provider.of<ModifyUserinfoModel>(context, listen: false).initialName;
     super.initState();
   }
   @override

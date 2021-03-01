@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../model/account_model.dart';
 import 'login_model.dart';
 
 class LoginPage extends StatelessWidget {
@@ -33,7 +34,7 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
   var passwordController = TextEditingController();
 
   loginButtonPressed(){
-    Provider.of<LoginModel>(context, listen: false).commit();
+    Provider.of<LoginModel>(context, listen: false).commit(Provider.of<AccountModel>(context, listen: false));
   }
 
   @override
