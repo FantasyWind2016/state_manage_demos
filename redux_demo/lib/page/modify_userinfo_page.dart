@@ -15,7 +15,7 @@ class ModifyUserInfoPage extends StatelessWidget {
           title: Text('Modify Name'),
         ),
         body: StoreProvider(
-          store: Store<ModifyUserinfoState>(loginReducer, initialState: ModifyUserinfoState(initialName: AccountManager.instance.accountModel.userModel?.name)),
+          store: Store<ModifyUserinfoState>(modifyUserinfoReducer, initialState: ModifyUserinfoState(initialName: AccountManager.instance.accountModel.userModel?.name)),
           child: _ModifyUserInfoPageBody()
         ),
       ),

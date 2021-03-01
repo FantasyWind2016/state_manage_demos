@@ -3,7 +3,7 @@ import 'package:redux_demo/model/user_model.dart';
 import '../model/account_model.dart';
 import '../utils/account_manager.dart';
 
-ModifyUserinfoState loginReducer(ModifyUserinfoState state, action) {
+ModifyUserinfoState modifyUserinfoReducer(ModifyUserinfoState state, action) {
   if (action is NameUpdate) {
     return state.copyWith(name: action.name);
   } else if (action is Commit) {
