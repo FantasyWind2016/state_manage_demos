@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '../model/account_model.dart';
-import '../model/user_model.dart';
-import '../utils/account_manager.dart';
+import 'login_viewmodel.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -27,24 +25,24 @@ class _LoginPageBody extends StatefulWidget {
 }
 
 class _LoginPageBodyState extends State<_LoginPageBody> {
-  void loginButtonPressed() {
-    AccountModel accountModel = AccountModel();
-    accountModel.accountID = 'u123456';
-    accountModel.userName = userNameController.text;
-    accountModel.password = passwordController.text;
-    AccountManager.instance.saveInfo(accountModel);
+  var viewmodel = LoginViewModel();
 
-    Navigator.of(context).pop();
+  @override
+  void initState() {
+    viewmodel.commitSuccessSubject.listen((onData){
+      if (onData) {
+        Navigator.of(context).pop();
+      }
+    });
+    super.initState();
+  }
+
+  void loginButtonPressed() {
+    viewmodel.commit();
   }
 
   var userNameController = TextEditingController();
   var passwordController = TextEditingController();
-  bool loginButtonEnable = false;
-  void onTextChanged(_){  
-    setState(() {
-      loginButtonEnable = (userNameController.text != null && userNameController.text.length>0) && (passwordController.text != null && passwordController.text.length>4);
-    });
-  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -55,7 +53,9 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
             Expanded(
               child: TextField(
                 controller: userNameController,
-                onChanged: onTextChanged,
+                onChanged: (value){
+                  viewmodel.unSubject.add(value);
+                },
               ),
             )
           ],
@@ -66,7 +66,9 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
             Expanded(
               child: TextField(
                 controller: passwordController,
-                onChanged: onTextChanged,
+                onChanged: (value) {
+                  viewmodel.psSubject.add(value);
+                },
               ),
             )
           ],
@@ -74,16 +76,19 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
         Row(
           children: <Widget>[
             Expanded(
-              child: FlatButton(
-                onPressed: loginButtonEnable ? loginButtonPressed : null,
-                child: Text(
-                  '登录',
-                  style: TextStyle(
-                    color: Colors.white,
+              child: StreamBuilder<bool>(
+                stream: viewmodel.commitButtonEnableSubject.stream,
+                builder:(context, value) => FlatButton(
+                  onPressed: value?.data??false ? loginButtonPressed : null,
+                  child: Text(
+                    '登录',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
+                  color: Colors.green[600],
+                  disabledColor: Colors.grey[400],
                 ),
-                color: Colors.green[600],
-                disabledColor: Colors.grey[400],
               ),
             ),
           ],
