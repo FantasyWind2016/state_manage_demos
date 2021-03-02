@@ -1,7 +1,9 @@
-# 状态管理演示Demo
+# Flutter状态管理框架比较
 
-本项目使用了不同的框架完成同一功能Demo的状态管理，用来比较不同框架在状态管理中功能的异同点。  
+在项目中使用了不同的框架完成同一功能Demo的状态管理，用来比较不同框架在状态管理中功能的异同点。  
 功能包含了全局账户信息，登录页表单，修改用户信息页数据反显。  
+
+源码地址：[https://github.com/FantasyWind2016/state_manage_demos/](https://github.com/FantasyWind2016/state_manage_demos/)
 
 ## 框架介绍
 
