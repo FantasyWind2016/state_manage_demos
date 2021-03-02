@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '../model/account_model.dart';
-import '../model/user_model.dart';
-import '../utils/account_manager.dart';
+import 'modify_userinfo_viewmodel.dart';
 
 class ModifyUserInfoPage extends StatelessWidget {
   const ModifyUserInfoPage({Key key}) : super(key: key);
@@ -27,27 +25,23 @@ class _ModifyUserInfoPageBody extends StatefulWidget {
 }
 
 class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
-  void confirmButtonPressed() {
-    AccountModel accountModel = AccountManager.instance.accountModel;
-    accountModel.userModel = UserModel();
-    accountModel.userModel.name = nameController.text;
-    AccountManager.instance.saveInfo(accountModel);
-
-    Navigator.of(context).pop();
-  }
-
+  var viewmodel = ModifyUserinfoViewmodel();
   var nameController = TextEditingController();
-  bool confirmButtonEnable = false;
-  void onTextChanged(_){  
-    setState(() {
-      confirmButtonEnable = nameController.text != null && nameController.text.length>0 && nameController.text != AccountManager.instance.accountModel.userModel.name;
-    });
-  }
   @override
   void initState() {
-    nameController.text = AccountManager.instance.accountModel.userModel.name;
+    nameController.text = viewmodel.initialName;
+    viewmodel.commitSuccessSubject.listen((onData){
+      if (onData) {
+        Navigator.of(context).pop();
+      }
+    });
     super.initState();
   }
+  
+  void confirmButtonPressed() {
+    viewmodel.commit();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -58,7 +52,9 @@ class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
             Expanded(
               child: TextField(
                 controller: nameController,
-                onChanged: onTextChanged,
+                onChanged: (value){
+                  viewmodel.nameSubject.add(value);
+                },
               ),
             )
           ],
@@ -66,16 +62,19 @@ class _ModifyUserInfoPageBodyState extends State<_ModifyUserInfoPageBody> {
         Row(
           children: <Widget>[
             Expanded(
-              child: FlatButton(
-                onPressed: confirmButtonEnable ? confirmButtonPressed : null,
-                child: Text(
-                  '修改',
-                  style: TextStyle(
-                    color: Colors.white,
+              child: StreamBuilder(
+                stream: viewmodel.commitButtonEnableSubject,
+                builder:(context, value) => FlatButton(
+                  onPressed: value?.data??false ? confirmButtonPressed : null,
+                  child: Text(
+                    '修改',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
+                  color: Colors.green[600],
+                  disabledColor: Colors.grey[400],
                 ),
-                color: Colors.green[600],
-                disabledColor: Colors.grey[400],
               ),
             ),
           ],
