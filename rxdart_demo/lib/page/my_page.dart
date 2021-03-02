@@ -3,7 +3,6 @@ import '../model/account_model.dart';
 import '../page/login_page.dart';
 import '../page/modify_userinfo_page.dart';
 import '../utils/account_manager.dart';
-import '../utils/event_bus_util.dart';
 
 class MyPage extends StatelessWidget {
   final String title;
@@ -30,29 +29,6 @@ class _MyPageBody extends StatefulWidget {
 }
 
 class _MyPageBodyState extends State<_MyPageBody> {
-  bool showLogoutButton;
-  String userName;
-  String name;
-  void refreshState() {
-    showLogoutButton = !(AccountManager.instance.accountModel.accountID == null ||
-        AccountManager.instance.accountModel.accountID.length == 0);
-    userName = AccountManager.instance.accountModel?.userName;
-    name = AccountManager.instance.accountModel?.userModel?.name;
-  }
-
-  @override
-  void initState() {
-    refreshState();
-    EventBusUtil.instance.on<AccountModelUpdatedEvent>().listen((onData) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        refreshState();
-      });
-    });
-    super.initState();
-  }
 
   void unloginButtonPressed() {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) {
@@ -72,32 +48,34 @@ class _MyPageBodyState extends State<_MyPageBody> {
   }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(children: [
+    return StreamBuilder<AccountModel>(
+      initialData: AccountManager.instance.accountModelSubject.value,
+      stream: AccountManager.instance.accountModelSubject,
+      builder:(context, value) => Column(children: [
         Visibility(
-          visible: !showLogoutButton,
+          visible: value.data.isUnlogin,
           child: FlatButton(
             onPressed: unloginButtonPressed, 
             child: Text('用户未登录')
           ),
         ),
         Visibility(
-          visible: showLogoutButton,
+          visible: !value.data.isUnlogin,
           child: Row(
             children: <Widget>[
               Icon(Icons.account_circle, size: 44,),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(userName??''),
-                  Text(name??''),
+                  Text(value.data.userName??''),
+                  Text(value.data.userModel?.name??''),
                 ],
               ),
             ],
           )
         ),
         Visibility(
-          visible: showLogoutButton,
+          visible: !value.data.isUnlogin,
           child: Row(
             children: <Widget>[
               Expanded(
@@ -116,7 +94,7 @@ class _MyPageBodyState extends State<_MyPageBody> {
           ),
         ),
         Visibility(
-          visible: showLogoutButton,
+          visible: !value.data.isUnlogin,
           child: Row(
             children: <Widget>[
               Expanded(

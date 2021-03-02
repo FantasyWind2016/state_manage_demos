@@ -14,12 +14,12 @@ class ModifyUserinfoViewmodel {
     commitButtonEnableSubject.close();
     commitSuccessSubject.close();
   }
-  String initialName = AccountManager.instance.accountModel?.userModel?.name;
+  String initialName = AccountManager.instance.accountModelSubject.value?.userModel?.name;
   BehaviorSubject<String> nameSubject = BehaviorSubject.seeded('');
   BehaviorSubject<bool> commitButtonEnableSubject = BehaviorSubject.seeded(false);
   BehaviorSubject<bool> commitSuccessSubject = BehaviorSubject.seeded(false);
   commit(){
-    AccountModel accountModel = AccountManager.instance.accountModel;
+    AccountModel accountModel = AccountManager.instance.accountModelSubject.value;
     accountModel.userModel = UserModel();
     accountModel.userModel.name = nameSubject.value;
     AccountManager.instance.saveInfo(accountModel);

@@ -1,14 +1,16 @@
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../model/account_model.dart';
 import '../model/user_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../utils/event_bus_util.dart';
 
 class AccountManager {
   static AccountManager instance = AccountManager();
-  AccountModel accountModel = AccountModel();
+  BehaviorSubject<AccountModel> accountModelSubject = BehaviorSubject.seeded(AccountModel());
+  dispose(){
+    accountModelSubject.close();
+  }
 
   Future<void> saveInfo (AccountModel model) async {
     var sf = await SharedPreferences.getInstance();
@@ -22,9 +24,7 @@ class AccountManager {
           'name': model.userModel?.name
         }
       }));
-      accountModel = model;
-      EventBusUtil.instance.fire(AccountModelUpdatedEvent());
-    // });
+      accountModelSubject.add(model);
   }
 
   void loadInfo() {
@@ -35,15 +35,15 @@ class AccountManager {
       }
       var value = jsonDecode(str);
       if (value!=null) {
-        accountModel = AccountModel();
+        var accountModel = AccountModel();
         accountModel.accountID = value['accountID'];
         accountModel.userName = value['userName'];
         accountModel.password = value['password'];
         var userModelValue = value['userModel'];
         accountModel.userModel = UserModel();
         accountModel.userModel.name = userModelValue['name'];
+        accountModelSubject.add(accountModel);
       }
-      EventBusUtil.instance.fire(AccountModelUpdatedEvent());
     });
   }
 }
