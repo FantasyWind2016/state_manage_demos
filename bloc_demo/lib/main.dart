@@ -5,12 +5,12 @@ import 'bloc/account_bloc.dart';
 import 'page/root_page.dart';
 
 void main() => runApp(
-    BlocProvider(
-      create: (_)=>AccountBloc(),
-      lazy: false,
-      child:MyApp()
-    )
-  );
+  BlocProvider(
+    create: (_)=>AccountBloc(),
+    lazy: false,
+    child:MyApp()
+  )
+);
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.

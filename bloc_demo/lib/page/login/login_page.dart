@@ -1,5 +1,5 @@
 import 'package:bloc_demo/bloc/account_bloc.dart';
-import 'package:bloc_demo/bloc/login_bloc.dart';
+import 'bloc/login_bloc.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,6 +31,21 @@ class _LoginPageBody extends StatefulWidget {
 }
 
 class _LoginPageBodyState extends State<_LoginPageBody> {
+  @override
+  void initState() {
+    BlocProvider.of<LoginBloc>(context).listen((onData){
+      if (onData.loginSuccess) {
+        BlocProvider.of<AccountBloc>(context)?.add(AccountUpdate(
+          accountID: 'u123456',
+          userName: onData.userName,
+          password: onData.password,
+        ));
+        Navigator.of(context).pop();
+      }
+    });
+    super.initState();
+  }
+  
   void loginButtonPressed() {
     BlocProvider.of<LoginBloc>(context).add(CommitButtonClick());
   }
@@ -40,17 +55,7 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
   
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LoginBloc, LoginInitial>(
-      listener: (context, state) {
-        if (state.loginSuccess) {
-          BlocProvider.of<AccountBloc>(context)?.add(AccountUpdate(
-            accountID: 'u123456',
-            userName: state.userName,
-            password: state.password,
-          ));
-          Navigator.of(context).pop();
-        }
-      },
+    return Container(
       child:Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Row(
           children: <Widget>[
@@ -79,7 +84,8 @@ class _LoginPageBodyState extends State<_LoginPageBody> {
           ],
         ),
         // 这里也可以去掉，然后把上面的BlocListener改为Consumer，但rebuild返回就变大了。
-        BlocBuilder<LoginBloc, LoginInitial>(
+        BlocBuilder<LoginBloc, LoginState>(
+          condition: (pre, next) => pre.loginButtonEnabled!=next.loginButtonEnabled,
           builder: (context, state) {
             return Row(
               children: <Widget>[

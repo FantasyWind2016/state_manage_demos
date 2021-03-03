@@ -1,8 +1,9 @@
 import 'package:bloc_demo/bloc/account_bloc.dart';
-import 'package:bloc_demo/bloc/modify_userinfo_bloc.dart';
+import 'bloc/modify_userinfo_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../model/user_model.dart';
+import '../../model/user_model.dart';
+import '../my/bloc/my_bloc.dart';
 
 class ModifyUserInfoPage extends StatelessWidget {
 
@@ -42,7 +43,6 @@ class ModifyUserInfoPage extends StatelessWidget {
           BlocProvider.of<AccountBloc>(context)?.add(AccountUpdate(
             userModel: userModel,
           ));
-
           Navigator.of(context).pop();
         }
       },

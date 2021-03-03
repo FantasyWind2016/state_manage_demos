@@ -1,31 +1,25 @@
 part of 'login_bloc.dart';
 
-@immutable
-abstract class LoginState {}
-
-class LoginInitial extends LoginState {
+class LoginState {
   final String userName;
   final String password;
-  final bool loginButtonEnabled;
+  bool get loginButtonEnabled => (userName != null && userName.length>0) && (password != null && password.length>4);
   final bool loginSuccess;
 
-  LoginInitial({
+  LoginState({
     this.userName,
     this.password,
-    this.loginButtonEnabled = false,
     this.loginSuccess = false,
   });
 
-  LoginInitial copyWith({
+  LoginState copyWith({
     String userName,
     String password,
-    bool loginButtonEnabled,
     bool loginSuccess,
   }) {
-    return LoginInitial(
+    return LoginState(
       userName: userName ?? this.userName,
       password: password ?? this.password,
-      loginButtonEnabled: loginButtonEnabled ?? this.loginButtonEnabled,
       loginSuccess: loginSuccess ?? this.loginSuccess,
     );
   }

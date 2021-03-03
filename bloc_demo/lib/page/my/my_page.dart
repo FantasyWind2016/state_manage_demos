@@ -1,8 +1,9 @@
 import 'package:bloc_demo/bloc/account_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../page/login_page.dart';
-import '../page/modify_userinfo_page.dart';
+import '../login/login_page.dart';
+import '../modify_userinfo/modify_userinfo_page.dart';
+import 'bloc/my_bloc.dart';
 
 class MyPage extends StatelessWidget {
   final String title;
@@ -15,7 +16,10 @@ class MyPage extends StatelessWidget {
         appBar: AppBar(
           title: Text(this.title),
         ),
-        body: _MyPageBody(),
+        body: BlocProvider<MyBloc>(
+          create: (context) => MyBloc(),
+          child: _MyPageBody(),
+        ),
       ),
     );
   }
@@ -29,7 +33,6 @@ class _MyPageBody extends StatefulWidget {
 }
 
 class _MyPageBodyState extends State<_MyPageBody> {
-
   void unloginButtonPressed() {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) {
       return LoginPage();
@@ -81,11 +84,15 @@ class _MyPageBodyState extends State<_MyPageBody> {
                   Expanded(
                     child: FlatButton(
                       onPressed: modifyNameButtonPressed,
-                      child: Text(
-                        '修改姓名',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
+                      child: BlocBuilder<MyBloc, MyState>(
+                        builder: (context, state) {
+                          return Text(
+                            state.modifySuccess ? '修改姓名成功' : '修改姓名',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          );
+                        },
                       ),
                       color: Colors.blue[100],
                     ),
